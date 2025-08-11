@@ -5,7 +5,7 @@ import { RiDeleteBin7Line } from "react-icons/ri";
 import { RxUpdate } from "react-icons/rx";
 import { ToastContainer } from 'react-toastify';
 import axios from "axios";
-import { createTask, getAllTasks } from './api.js';
+import { createTask, deleteTask, getAllTasks, updateTask } from './api.js';
 import { notify } from './utils.js';
 
 const TaskManager = () => {
@@ -48,6 +48,41 @@ const TaskManager = () => {
     useEffect(()=>{
         fetchAllTasks()
     },[])
+    const handleDeletetask = async(id)=>{
+        try {
+            const res =  await deleteTask(id);
+            if (res.success) {
+                notify(res.message, "success");
+                fetchAllTasks();
+            } else {
+                notify(res.message, "error");
+            }
+        } catch (error) {
+            console.log("error in deleting task:", err);
+            notify("failed to delete task ","error")
+        }
+    }
+    const handleEditTask = async (items)=>{
+           const {_id,taskName,isDone}= items;
+           const obj ={
+            taskName,
+            isDone:!isDone
+           }
+           try{
+            const{success,message} = await updateTask(_id,obj);
+            if(success){
+                notify(message,"success")
+            }
+            else{
+                notify(message,"error")
+            }
+            fetchAllTasks()
+           }
+           catch(err){
+            console.log(err);
+            notify("failed to create task", "error")
+           }
+    }
     return (
         <div className="flex flex-col items-center gap-10 min-h-screen p-4">
             {/* Title */}
@@ -85,25 +120,33 @@ const TaskManager = () => {
             </div>
 
             {/* Task List */}
-            <div className="flex flex-col sm:flex-row items-center gap-2 w-full max-w-2xl bg-gray-50 p-2 rounded shadow">
+            {
+                tasks.map((items)=>(
+                    <div 
+                    key={items._id}
+                    className="flex flex-col sm:flex-row items-center gap-2 w-full max-w-2xl bg-gray-50 p-2 rounded shadow">
                 {/* Task text */}
-                <span className="border p-2 flex-1 line-through bg-gray-200 text-center sm:text-left">
-                    first todo task you enter
+                <span className={`border p-2 flex-1  bg-gray-200 text-center sm:text-left ${items.isDone ?'line-through':''}`}>
+                    {items.taskName}
                 </span>
 
                 {/* Action buttons */}
                 <div className="flex gap-2">
-                    <button>
+                    <button
+                    onClick={()=>{handleEditTask(items)}}
+                    >
                         <FaCheck className="bg-green-400 p-2 w-10 h-10 border" />
                     </button>
                     <button>
                         <FaPenAlt className="border p-2 w-10 h-10" />
                     </button>
-                    <button>
+                    <button onClick={()=>{handleDeletetask(items._id)}} >
                         <RiDeleteBin7Line className="border p-2 w-10 h-10 bg-red-400" />
                     </button>
                 </div>
             </div>
+                ))
+            }
             <ToastContainer/>
         </div>
     );
