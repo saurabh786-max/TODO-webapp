@@ -11,6 +11,7 @@ import { notify } from './utils.js';
 const TaskManager = () => {
     const [Input, setInput] = useState("");
     const [tasks, setTasks] = useState([]);
+    const [copyTasks, setCopyTasks] = useState([]);
     const [changeTask, setChangeTask] = useState(null);
     const handleTask = async ()=>{
         if(changeTask && Input){
@@ -63,6 +64,7 @@ const TaskManager = () => {
        try {
          const {data} = await getAllTasks();
          setTasks(data);
+         setCopyTasks(data);
          console.log(data);
          
        } catch (error) {
@@ -119,7 +121,7 @@ const TaskManager = () => {
            try{
             const{success,message} = await updateTask(_id,obj);
             if(success){
-                notify(message,"success")
+                notify(" task updated!!","success")
             }
             else{
                 notify(message,"error")
@@ -130,6 +132,15 @@ const TaskManager = () => {
             console.log(err);
             notify("failed to create task", "error")
            }
+    }
+
+    const handleSearch = async(e)=>{
+        const term = e.target.value;
+        console.log(term);
+        const oldTask = [...copyTasks];
+        console.log("old tasks",oldTask)
+        const result = oldTask.filter((items)=>items.taskName.toLowerCase().includes(term));
+        setTasks(result);
     }
     return (
         <div className="flex flex-col items-center gap-10 min-h-screen p-4">
@@ -157,10 +168,12 @@ const TaskManager = () => {
                 {/* Search Task */}
                 <div className="flex w-full sm:w-auto">
                     <span>
-                        <FaSearch className="h-10 w-10 bg-gray-400 border border-r-0 rounded-l p-2" />
+                        <FaSearch
+                         className="h-10 w-10 bg-gray-400 border border-r-0 rounded-l p-2" />
                     </span>
                     <input
                         type="text"
+                        onChange={handleSearch}
                         className="border p-1 border-l-0 rounded-r w-full sm:w-48"
                         placeholder="search task"
                     />
