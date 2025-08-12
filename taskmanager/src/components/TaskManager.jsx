@@ -11,6 +11,31 @@ import { notify } from './utils.js';
 const TaskManager = () => {
     const [Input, setInput] = useState("");
     const [tasks, setTasks] = useState([]);
+    const [changeTask, setChangeTask] = useState(null);
+    const handleTask = async ()=>{
+        if(changeTask && Input){
+            console.log("update api call ")
+            const obj = {
+                taskName: Input,
+                isDone:changeTask.isDone,
+                _id :changeTask._id
+            }
+            await handleUpdateTask(obj);
+            setInput("")
+            setChangeTask(null);
+
+        }
+        else if(changeTask === null && Input){
+            console.log("create api call ")
+            handleAddTask()
+        }
+    }
+
+    useEffect(()=>{
+        if(changeTask){
+            setInput(changeTask.taskName)
+        }
+    },[changeTask])
     const handleAddTask = async () => {
         const obj = {
             taskName: Input,
@@ -48,6 +73,29 @@ const TaskManager = () => {
     useEffect(()=>{
         fetchAllTasks()
     },[])
+    const handleUpdateTask = async(items)=>{
+        const {_id,taskName,isDone} = await items;
+        const obj = {
+            taskName,
+           isDone,
+        }
+        try{
+           const {success, message} = await updateTask(_id,obj);
+           if(success){
+            notify(message,'success')
+           }
+           else{
+            notify(message,"error")
+           }
+           fetchAllTasks();
+        }
+        catch(error){
+            console.log(err);
+            notify("failed to create task ", "error");
+        }
+
+    }
+
     const handleDeletetask = async(id)=>{
         try {
             const res =  await deleteTask(id);
@@ -100,7 +148,7 @@ const TaskManager = () => {
                         placeholder="add task"
                     />
                     <button
-                        onClick={handleAddTask}
+                        onClick={handleTask}
                         className="border rounded-t-none h-11 w-12 flex items-center justify-center bg-green-500 text-white cursor-pointer  hover:bg-green-600 ">
                         <FaPlus />
                     </button>
@@ -137,7 +185,10 @@ const TaskManager = () => {
                     >
                         <FaCheck className="bg-green-400 p-2 w-10 h-10 border" />
                     </button>
-                    <button>
+                    <button
+                    onClick={()=>{setChangeTask(items)
+                    }}
+                    >
                         <FaPenAlt className="border p-2 w-10 h-10" />
                     </button>
                     <button onClick={()=>{handleDeletetask(items._id)}} >
