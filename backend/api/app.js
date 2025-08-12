@@ -20,7 +20,7 @@ app.use(express.urlencoded({
 app.use(cookieParser());
 
 // importing routes 
-import { taskRouter } from "./routes/task.routes.js";
+import { taskRouter } from "../src/routes/task.routes.js";
 
 app.use("/api/v1/users",taskRouter)
 
