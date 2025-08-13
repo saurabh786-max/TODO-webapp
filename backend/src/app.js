@@ -24,5 +24,9 @@ import { taskRouter } from "./routes/task.routes.js";
 
 app.use("/api/v1/users",taskRouter)
 
+app.get("/", (req, res) => {
+    res.send("Server is live 🚀");
+});
+
 
 export default app
