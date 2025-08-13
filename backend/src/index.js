@@ -10,9 +10,9 @@ dotenv.config({
 connectDB ()
 .then(
     ()=>{
-        app.listen( process.env.PORT || 8000,()=>{
-            console.log(`server is listing at the port :${process.env.PORT}`)
+        console.log("✅ Database connected successfully");
         })
-    }
-)
 .catch((error)=> console.log(error))
+
+
+export default app
