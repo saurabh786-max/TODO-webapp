@@ -2,7 +2,7 @@
 import axios from "axios";
 
 const API = axios.create({
-    baseURL: "http://localhost:8000/api/v1/users", // backend URL
+    baseURL: "https://todo-webapp-api.vercel.app/api/v1/users", // backend URL
     withCredentials: true // important for cookies/auth
 });
 
